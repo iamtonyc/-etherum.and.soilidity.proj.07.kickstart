@@ -57,7 +57,7 @@ contract Campaign{
             requests.push(newRequest);
         }
 
-        function approverRequest(uint index) public {
+        function approveRequest(uint index) public {
             Request storage request = requests[index];
 
             require(approvers[msg.sender]);
