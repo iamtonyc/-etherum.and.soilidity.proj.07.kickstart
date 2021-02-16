@@ -1,25 +1,95 @@
-import React, {Component } from 'react';
-import Layout from '../../components/Layout.js';
-import Campaign from  '../../ethereum/campaign';
-
+import React, { Component } from "react";
+import { Card, Grid, Button } from "semantic-ui-react";
+import Layout from "../../components/Layout.js";
+import Campaign from "../../ethereum/campaign";
+import web3 from "../../ethereum/web3.js";
+import ContributeForm from "../../components/ContributeForm.js";
+import { Link } from "../../routes";
 
 class CampaignShow extends Component {
-    static async getInitialProps(props){
-        const campaign = Campaign(props.query.address);
-        const summary =await campaign.methods.getSummary().call();
+  static async getInitialProps(props) {
+    const campaign = Campaign(props.query.address);
+    const summary = await campaign.methods.getSummary().call();
 
-        console.log(summary);
-        return {};
-    }
+    return {
+      address: props.query.address,
+      minimumContribution: summary[0],
+      balance: summary[1],
+      requestsCount: summary[2],
+      approversCount: summary[3],
+      manager: summary[4],
+    };
+  }
 
+  renderCards() {
+    const {
+      balance,
+      manager,
+      minimumContribution,
+      requestsCount,
+      approversCount,
+    } = this.props;
 
-    render() {
-        return(
-            <Layout>
-                <h3>Campaign Show</h3>;
-            </Layout>
-        );
-    }
+    const items = [
+      {
+        header: manager,
+        style: { overflowWrap: "break-down" },
+        meta: "Address of Manager",
+        description: "The manager created this campaign and can created",
+        style: { overflowWrap: "break-down" },
+      },
+      {
+        header: minimumContribution,
+        meta: "Minium Contribution (wei)",
+        description:
+          "You must contribute at least this much wei to create a campaign",
+      },
+      {
+        header: requestsCount,
+        meta: "Number of Request",
+        description:
+          "A request tries to withdraw money from the Contract. Requests must be approved.",
+      },
+      {
+        header: approversCount,
+        meta: "Number of Approvers",
+        description: "No. of people who have already donated this campaign",
+      },
+      {
+        header: web3.utils.fromWei(balance, "ether"),
+        meta: "Campaign Balance (ethere)",
+        description: "The balance is how much this campaign has left to spend.",
+      },
+    ];
+
+    return <Card.Group items={items} />;
+  }
+
+  render() {
+    return (
+      <Layout>
+        <h3>Campaign Show</h3>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width={10}>{this.renderCards()}</Grid.Column>
+            <Grid.Column width={6}>
+              <ContributeForm address={this.props.address} />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
+              <Link route={`/campaigns/${this.props.address}/requests`}>
+                <a>
+                  <Button primary>View Requests</Button>
+                </a>
+              </Link>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Layout>
+    );
+    <Message error header="Oops" content={this.state.errorMessage} />;
+  }
 }
 
 export default CampaignShow;
