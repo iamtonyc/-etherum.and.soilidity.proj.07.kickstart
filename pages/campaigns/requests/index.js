@@ -18,15 +18,18 @@ class RequestIndex extends Component {
         .map((element, index) => {
           return campaign.methods.requests(index).call();
         })
+        
     );
+    console.log(requests);
     return { address, requests, requestCount };
   }
 
   renderRows(){
-      return <RequestRow/>;
+      
        return this.props.requests.map((request, index)=>{
          return <RequestRow
                   key={index}
+                  id={index}
                   request ={request}
                   address={this.props.address}
                 />
