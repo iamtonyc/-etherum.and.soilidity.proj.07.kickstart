@@ -5,11 +5,14 @@ import web3 from "../../../ethereum/web3";
 import { Link, Router } from "../../../routes";
 import Layout from "../../../components/Layout";
 
+
 class RequestNew extends Component {
   state = {
     value: "",
     description: "",
     receipent: "",
+    loading : false,
+    errorMessage : ''
   };
   static async getInitialProps(props) {
     const { address } = props.query;
@@ -21,6 +24,8 @@ class RequestNew extends Component {
     event.preventDefault();
     const campaign = Campaign(this.props.address);
     const {description, value, receipent}=this.state;
+
+    this.setState({loading: true, errorMessage:''});
     try{
         const accounts=await web3.eth.getAccounts();
         await campaign.methods.createRequest(
@@ -28,18 +33,26 @@ class RequestNew extends Component {
             web3.utils.toWei(value, 'ether'),
             receipent
         ).send({from: accounts[0]});
+
+        Router.pushRoute(`/campaigns/${this.props.address}/requests`);
     }
     catch (err)
     {
-      console.log("err"+err);
+      this.setState({errorMessage: err.message});
     }
+    this.setState({loading: false});
   }
 
   render() {
     return (
       <Layout>
+        <Link route={`/campaigns/${this.props.address}/requests`}>
+          <a>
+            <Button primary>Back</Button>
+          </a>
+        </Link>
         <h3>Create a Request</h3>
-        <Form onSubmit={this.onSubmit}> 
+        <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}> 
           <Form.Field>
             <label>Description</label>
             <Input
@@ -65,6 +78,7 @@ class RequestNew extends Component {
               }
             />
           </Form.Field>
+          <Message error header="Oops!" content={this.state.errorMessage}/>
           <Button>Create</Button>
         </Form>
         
