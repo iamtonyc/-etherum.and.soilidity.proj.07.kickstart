@@ -8,17 +8,19 @@ npm install --save next@4.1.4 react react-dom
 npm remove react react-dom
 npm install --save react@16 react-dom@16
 npm install --save next
+npm install --save semantic-ui-react@0.77.1
+npm install --save next-route
 
 
+2) Compile
+node compile.js
 
-2) Deploy
+3) Deploy
 node deploy.js
 
-3) test
+4) test
 npm run test
 
-
-
-4) start
+5) start
 type "npm run dev"
 
